@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         百度网盘网页版隐藏“我的卡包”和“我的应用数据”
-// @namespace    https://zhichengroup.github.io
+// @namespace    https://github.com/zhichengroup/Baidu-network-disk-hidden-folder
 // @version      0.1.22 beta
 // @description  百度网盘网页版隐藏“我的卡包”和“我的应用数据” 2018-09-02 可用
 // @author       zhichengroup
