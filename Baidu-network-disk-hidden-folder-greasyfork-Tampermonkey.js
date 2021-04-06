@@ -1,65 +1,103 @@
+// ========================================== 设置 ==========================================
+ 
+// 可以自定义是否隐藏
+// 修改 '是' 或 '否'
+ 
+var 隐藏已购资源 = '是';
+var 隐藏我的卡包 = '是';
+var 隐藏我的应用数据 = '是';
+var 共享给我的文件夹 = '是';
+ 
+// 自定义隐藏文件夹，包括但不限于根目录，请慎重，文件夹之间请用英文状态下的分号隔开
+// 注意：尽量使用英文状态的分号、要隐藏的文件或文件名尽量不要含有特殊字符、名字尽量准确
+var 开启自定义文件夹隐藏 = '否';
+var 自定义文件夹 = "来自：“百度相册” ; 来自：小飞机 ; 测试自定义隐藏文件夹1 ; 测试自定义隐藏文件夹2 ; 测试自定义隐藏文件夹3";
+ 
+// 本插件的执行频率：默认为60，刷新时间范围建议在30-300之间（单位毫秒ms）。
+var hide_update_time = 60;
+ 
+// ========================================== 设置结束 =======================================
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+// todo:正则表达式和控制指定单级目录内文件夹和文件
+ 
 // ==UserScript==
-// @name         百度网盘网页版隐藏“我的卡包”、“我的应用数据”和“已购资源”   2019-06-13 更新
+// @name         百度网盘网页版隐藏“我的卡包”、“我的应用数据”和“已购资源”
 // @namespace    https://github.com/zhichengroup/Baidu-network-disk-hidden-folder
-// @version      0.9.11 beta
-// @description  百度网盘网页版隐藏“我的卡包”、“我的应用数据”和“已购资源”   2019-06-13 更新
+// @version      0.9.53 beta 2
+// @description  百度网盘隐藏“我的卡包”、“我的应用数据”、“已购资源”和“共享给我的文件夹”   2021-01-19 更新
 // @author       zhichengroup
 // @match        *://pan.baidu.com/*
 // @include      *://pan.baidu.com/*
-// @require      https:code.jquery.com/jquery-1.12.4.min.js
-
-/*
-# 百度网盘网页版隐藏“我的卡包”、“我的应用数据”和“已购资源”
-### Baidu-network-disk-hidden-folder
-### Tampermonkey GreasyFork
-### 2019-06-13 更新
-### pan.baidu.com
-### 注意
-此脚本只能在网页版隐藏“我的卡包”和“我的应用数据”，并不能实际删除！！！
-### 无关脚本的话
-“我的应用数据”文件夹是可以通过接口删除的。
-理论上如果不用百度系app（比如百度输入法，百度浏览器等，我不知道“我的应用数据”文件夹是由哪个百度系app触发的）是不会再生成的。
-目前正在测试，云端删除“我的应用数据”文件夹没有再自动恢复过，“我的卡包”文件夹删除。
-### 联系方式
-如果对这个脚本有兴趣，或者想尝试我的思路，脚本失效或者好久没更新请联系我，我会尽量完善。
-zhichengroup@gmail.com   [greasyfork](https://greasyfork.org/scripts/371821)   [github](https://github.com/zhichengroup/Baidu-network-disk-hidden-folder)
-*/
-
 // ==/UserScript==
-
+ 
 (function() {
-	'use strict';
-
-	function clearfunc() {
-        $("dd:first").hide();
-        $("dd.open-enable.AuPKyz.g-clearfix:nth-of-type(1)").hide();
-		$("dd.open-enable.AuPKyz.g-clearfix:nth-of-type(2)").hide();
-        //$("[title='已购资源']").parent().parent().parent().hide(); // .remove();
-		//$("[title='我的卡包']").parent().parent().parent().hide(); // .remove();
-		$("[title='我的应用数据']").parent().parent().parent().hide(); // .remove();
-        //console.log("Baiduwangpan_script_hide_func");
-	};
-
-	$("*").click(function() {
-		clearfunc();
-	});
-
-	$("*").dblclick(function() {
-		clearfunc();
-	});
-
-	$("*").mouseenter(function() {
-		clearfunc();
-	});
-
-	$("*").mouseleave(function() {
-		clearfunc();
-	});
-
-	$(document).ready(function() {
-		clearfunc();
-	});
-	clearfunc();
-	console.log("Baiduwangpan_script_hide_func_success");
-
+    'use strict';
+    var dirList = [];
+    if(隐藏已购资源 == '是'){
+        dirList.push("已购资源");
+    }
+    if(隐藏我的卡包 == '是'){
+        dirList.push("我的卡包");
+    }
+    if(隐藏我的应用数据 == '是'){
+        dirList.push("我的应用数据");
+    }
+    if(共享给我的文件夹 == '是'){
+        dirList.push("共享给我的文件夹");
+    }
+    if(开启自定义文件夹隐藏 == '是'){
+        var dirListTemp = 自定义文件夹.split(";");
+        dirListTemp.forEach((e)=>{
+            e.split("；").forEach((e)=>{
+                dirList.push(e.trim());
+            });
+        });
+    }
+ 
+    // ====== 监听触发器 ======
+    clearfunc_new();
+    $("*").click(function() {
+        clearfunc_new();
+    });
+    $("*").dblclick(function() {
+        clearfunc_new();
+    });
+    $("*").mouseenter(function() {
+        clearfunc_new();
+    });
+    $("*").mouseleave(function() {
+        clearfunc_new();
+    });
+    $(document).ready(function() {
+        clearfunc_new();
+    });
+ 
+    // load
+    window.onload = function(){
+        clearfunc_new();
+    };
+ 
+    $(function () {
+        clearfunc_new();
+    });
+ 
+    // setInterval 定时
+    window.setInterval(clearfunc_new, hide_update_time);
+ 
+    function clearfunc_new() {
+        dirList.forEach(e=>{
+            $("[title='"+e+"']").parent().parent().parent().hide();
+        });
+    }
+ 
+    console.log("百度网盘网页版自定义隐藏文件夹插件已经运行",dirList);
+ 
 })();
